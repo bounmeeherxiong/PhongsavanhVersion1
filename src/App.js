@@ -18,6 +18,9 @@ function App() {
   const [listType, setListType] = useState([]);
   const [listCategory, setListCategory] = useState([]);
   const [listCategoryDetail,setListCategoryDetail]=useState([]);
+  const [listAccount,setListAccount]=useState({});
+  const [nameList, setNameList] = useState([]);
+  const [detailCategory, setDetailCategory] = useState([]);
   const OnloadType = () => {
     axios
       .get("/getType")
@@ -28,6 +31,18 @@ function App() {
         console.log(err);
       });
   };
+  const OnloadCategoryShow = () => {
+    axios
+      .get("/detailCategory")
+      .then((data) => {
+        setDetailCategory([...data.data.message]);
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const OnloadCategory = () => {
     axios
       .get("/getCategory")
@@ -46,12 +61,29 @@ function App() {
     })
     
   }
+  const Onloadaccounts=()=>{
+    axios.get("/Allaccounts").then((data)=>{
+      setListAccount({...data.data})
+
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }
+  const OnloadAccountName=()=>{
+    axios.get("/Accountnames").then((data) => {
+      setNameList([...data.data.message]);
+    }).catch((err)=>{
+      console.log(err)
+    })
+  }
   useEffect(() => {
     OnloadType();
     OnloadCategory();
     OnloadCategoryDetail();
+    Onloadaccounts();
+    OnloadAccountName();
+    OnloadCategoryShow();
   }, []);
-
   return (
     <div>
       <LoginContext.Provider
@@ -61,7 +93,11 @@ function App() {
           listCategory,
           OnloadCategory,
           listCategoryDetail,
-          OnloadCategoryDetail
+          OnloadCategoryDetail,
+          listAccount,
+          Onloadaccounts,
+          nameList,
+          detailCategory
         }}
       >
         <Router>

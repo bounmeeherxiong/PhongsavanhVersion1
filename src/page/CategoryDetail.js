@@ -53,7 +53,7 @@ export default function CategoryDetail() {
   };
 
   const deletecategorydetail = (id) => {
-    console.log(id)
+
     axios
       .delete(`/deletedCategoryDetail/${id}`)
       .then((data) => {
