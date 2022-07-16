@@ -14,7 +14,7 @@ import { LoginContext } from "./contexts/LoginContext";
 import moment from "moment";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-
+import DeleteIcon from "@material-ui/icons/Delete";
 
 export default function ChartAccounts() {
   const [show, setShow] = useState(false);
@@ -23,6 +23,7 @@ export default function ChartAccounts() {
     setType("");
     setShowUpdate(false);
     setCheck(false);
+    setPrentid("");
   };
   const handleShow = () => setShow(true);
   const [type, setType] = useState("");
@@ -32,53 +33,61 @@ export default function ChartAccounts() {
   const [prentid, setPrentid] = useState("");
   const [check, setCheck] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
-  const [checksub,setChecksub]=useState(true)
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [checked, setChecked] = useState(false);
 
   const [detailCategoryFilter, setDetailCategoryFilter] = useState([]);
-  const { listCategory, listAccount, nameList } = useContext(LoginContext);
-
+  const { listCategory, listAccount, Onloadaccounts, nameList,OnloadAccountName } =
+    useContext(LoginContext);
 
   useEffect(() => {
     // console.log(type)
     // const filter = detailCategory.filter((el) => el.Category_id === type);
     // console.log("filter=",filter)
     // setDetailCategoryFilter([...filter]);
-    Search(type)
-    
+    Search(type);
   }, [type]);
 
-  if(check ===true)
-  {
-    setPrentid("0")
-  }
-  const Search=(type)=>{
-    axios.get(`/showdetailCategory/${type}`).then((data)=>{
-      setDetailCategoryFilter([...data?.data])
-    }).catch((err)=>{
-      console.log(err)
+  const onCheckboxClick = () => {
+    setIsDisabled(!checked);
+  };
+  const Search = (type) => {
+    axios
+      .get(`/showdetailCategory/${type}`)
+      .then((data) => {
+        setDetailCategoryFilter([...data?.data]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
-    })
-  }
-
-  const CreateChartAccount=()=>{
-    let data={
-      Category_id:type,
-      DetailCategory_id:typedetail,
-      ChartAccountName:name,
+  const CreateChartAccount = () => {
+    let data = {
+      Category_id: type,
+      DetailCategory_id: typedetail,
+      ChartAccountName: name,
       CreateDate: moment().format("YYYY-MM-DD"),
-      Employee:'1',
-      Company_id:'1',
-      Description:description,
-      parent_id:prentid
-
-    }
-  
-  }
-
-
+      Employee: "1",
+      Company_id: "1",
+      Description: description,
+      parent_id: prentid,
+    };
+    axios
+      .post("/CreateChartAccount", data)
+      .then((data) => {
+        Onloadaccounts();
+        OnloadAccountName();
+        handleClose(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const [nameShow, setNameShow] = useState("");
   const getNameList = (name) => {
+
     axios.get(`/Allparents/${name}`).then((data) => {
       if (data?.data?.message.length > 0) {
         // console.log("name=",data?.data.message[0].Account_id);
@@ -123,10 +132,13 @@ export default function ChartAccounts() {
                     onChange={(e) => setType(e.target.value)}
                     value={type}
                   >
+                    <option>ໃຫ້ເລືອກປະເພດ</option>
                     {listCategory &&
                       listCategory.map((data, index) => {
                         return (
-                          <option  key={index} value={data?.Category_id} >{data?.Category_name}</option>
+                          <option key={index} value={data?.Category_id}>
+                            {data?.Category_name}
+                          </option>
                         );
                       })}
                   </Form.Select>
@@ -141,13 +153,15 @@ export default function ChartAccounts() {
                     onChange={(e) => setTypedetail(e.target.value)}
                     value={typedetail}
                   >
-                    {detailCategoryFilter.map((data, index) => {
-                      return (
-                        <option key={index} value={data.Detail_id}>
-                          {data.DetailType}
-                        </option>
-                      );
-                    })}
+                    <option>ໃຫ້ເລືອກປະເພດ</option>
+                    {detailCategoryFilter &&
+                      detailCategoryFilter.map((data, index) => {
+                        return (
+                          <option key={index} value={data.Detail_id}>
+                            {data.DetailType}
+                          </option>
+                        );
+                      })}
                   </Form.Select>
                 </Form.Group>
 
@@ -189,12 +203,7 @@ export default function ChartAccounts() {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                  <Form.Check
-                    type="checkbox"
-                    label="Is sub-account"
-                
-                 
-                  />
+                  <Form.Check type="checkbox" label="Is sub-account" />
                 </Form.Group>
                 <Form.Group>
                   <Autocomplete
@@ -202,7 +211,6 @@ export default function ChartAccounts() {
                     id="combo-box-demo"
                     options={nameList}
                     sx={{ width: 300 }}
-                    disable          
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -225,7 +233,9 @@ export default function ChartAccounts() {
           {showUpdate ? (
             <Button variant="primary">Upate Changes1</Button>
           ) : (
-            <Button variant="primary" onClick={CreateChartAccount}>Save Changes1</Button>
+            <Button variant="primary" onClick={CreateChartAccount}>
+              Save Changes1
+            </Button>
           )}
         </Modal.Footer>
       </Modal>
@@ -266,6 +276,7 @@ export default function ChartAccounts() {
             }}
             onClick={() => {
               handleShow();
+              setPrentid("");
             }}
           >
             <AddIcon />
@@ -419,15 +430,14 @@ export default function ChartAccounts() {
                   <>
                     <tr key={index}>
                       <td>{item.ChartAccountName}</td>
-                      <th>NAME</th>
-                      <th>TYPE</th>
-                      <th>DETAIL TYPE</th>
-                      <th>BALANCE</th>
-                      <th>ACTION</th>
+                      <th>sadfaf</th>
+                      <th>sdfaf</th>
+                      <th>sdfaf</th>
+                      <th>afds</th>
                     </tr>
                     {/* Level 1 */}
                     <RowComponent
-                      children={listAccount.children}
+                      children={listAccount && listAccount.children}
                       id={item.Account_id}
                       level={20}
                     />
@@ -458,12 +468,10 @@ function RowComponent({ children, id, level }) {
               >
                 {data.ChartAccountName}
               </td>
-              <td>ຊື່</td>
-              <td>ປະເພດ</td>
-              <td>ບັນຊີ2009</td>
-              <td>ບັນຊີ1992</td>
-              <td>ສະຖານະ</td>
-              <td>ໝ້າທີ່</td>
+              <th>sadfaf</th>
+              <th>sdfaf</th>
+              <th>sdfaf</th>
+              <th>afds</th>
             </tr>
             <RowComponent
               children={children}

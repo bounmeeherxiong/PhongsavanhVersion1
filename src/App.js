@@ -97,7 +97,8 @@ function App() {
           listAccount,
           Onloadaccounts,
           nameList,
-          detailCategory
+          detailCategory,
+          OnloadAccountName
         }}
       >
         <Router>
