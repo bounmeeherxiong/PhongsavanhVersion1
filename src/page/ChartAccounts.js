@@ -20,10 +20,14 @@ export default function ChartAccounts() {
   const [show, setShow] = useState(false);
   const handleClose = () => {
     setShow(false);
-    setType("");
+    setType('');
     setShowUpdate(false);
     setCheck(false);
-    setPrentid("");
+    setName('');
+    setDescription('')
+    setTypedetail('')
+    setPrentid('')
+    setNameShow('')
   };
   const handleShow = () => setShow(true);
   const [type, setType] = useState("");
@@ -37,8 +41,13 @@ export default function ChartAccounts() {
   const [checked, setChecked] = useState(false);
 
   const [detailCategoryFilter, setDetailCategoryFilter] = useState([]);
-  const { listCategory, listAccount, Onloadaccounts, nameList,OnloadAccountName } =
-    useContext(LoginContext);
+  const {
+    listCategory,
+    listAccount,
+    Onloadaccounts,
+    nameList,
+    OnloadAccountName,
+  } = useContext(LoginContext);
 
   useEffect(() => {
     // console.log(type)
@@ -63,6 +72,10 @@ export default function ChartAccounts() {
   };
 
   const CreateChartAccount = () => {
+    if(!type || !typedetail || !name ){
+      alert('ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບ');
+      return 
+    }
     let data = {
       Category_id: type,
       DetailCategory_id: typedetail,
@@ -87,7 +100,6 @@ export default function ChartAccounts() {
 
   const [nameShow, setNameShow] = useState("");
   const getNameList = (name) => {
-
     axios.get(`/Allparents/${name}`).then((data) => {
       if (data?.data?.message.length > 0) {
         // console.log("name=",data?.data.message[0].Account_id);
@@ -276,7 +288,7 @@ export default function ChartAccounts() {
             }}
             onClick={() => {
               handleShow();
-              setPrentid("");
+              setPrentid('')
             }}
           >
             <AddIcon />
@@ -419,7 +431,7 @@ export default function ChartAccounts() {
               <th>TYPE</th>
               <th>DETAIL TYPE</th>
               <th>BALANCE</th>
-              <th>ACTION</th>
+              <th align="right">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -429,11 +441,13 @@ export default function ChartAccounts() {
                 return (
                   <>
                     <tr key={index}>
-                      <td>{item.ChartAccountName}</td>
-                      <th>sadfaf</th>
-                      <th>sdfaf</th>
-                      <th>sdfaf</th>
-                      <th>afds</th>
+                      <td style={{ width: 350 }}>{item.ChartAccountName}</td>
+                      <td>{item.Category_name}</td>
+                      <td>{item.DetailType}</td>
+                      <td>{item.Balance}</td>
+                      <td>
+                        <DeleteIcon />
+                      </td>
                     </tr>
                     {/* Level 1 */}
                     <RowComponent
@@ -468,10 +482,12 @@ function RowComponent({ children, id, level }) {
               >
                 {data.ChartAccountName}
               </td>
-              <th>sadfaf</th>
-              <th>sdfaf</th>
-              <th>sdfaf</th>
-              <th>afds</th>
+              <td>{data.Category_name}</td>
+              <td>{data.DetailType}</td>
+              <td>{data.Balance}</td>
+              <td>
+                <DeleteIcon />
+              </td>
             </tr>
             <RowComponent
               children={children}
