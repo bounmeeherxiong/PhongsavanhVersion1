@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 
-import { Table, Form, FloatingLabel } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
@@ -20,14 +20,14 @@ export default function ChartAccounts() {
   const [show, setShow] = useState(false);
   const handleClose = () => {
     setShow(false);
-    setType('');
+    setType("");
     setShowUpdate(false);
     setCheck(false);
-    setName('');
-    setDescription('')
-    setTypedetail('')
-    setPrentid('')
-    setNameShow('')
+    setName("");
+    setDescription("");
+    setTypedetail("");
+    setPrentid("");
+    setNameShow("");
   };
   const handleShow = () => setShow(true);
   const [type, setType] = useState("");
@@ -72,9 +72,9 @@ export default function ChartAccounts() {
   };
 
   const CreateChartAccount = () => {
-    if(!type || !typedetail || !name ){
-      alert('ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບ');
-      return 
+    if (!type || !typedetail || !name) {
+      alert("ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບ");
+      return;
     }
     let data = {
       Category_id: type,
@@ -288,7 +288,7 @@ export default function ChartAccounts() {
             }}
             onClick={() => {
               handleShow();
-              setPrentid('')
+              setPrentid("");
             }}
           >
             <AddIcon />
@@ -376,28 +376,7 @@ export default function ChartAccounts() {
         >
           <CloseIcon />
         </button>
-        <select
-          style={{
-            width: 200,
-            outline: "none",
-            border: "1px solid #DBDBDB",
-            height: 35,
-            marginLeft: 20,
-            paddingLeft: 10,
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <option>ຊະນິດທັງໝົດ</option>
-          {/* {listType &&
-            listType.map((data, index) => {
-              return (
-                <option value={data.uid} key={index}>
-                  {data?.name}
-                </option>
-              );
-            })} */}
-        </select>
+
         <div
           style={{
             display: "flex",
@@ -445,9 +424,7 @@ export default function ChartAccounts() {
                       <td>{item.Category_name}</td>
                       <td>{item.DetailType}</td>
                       <td>{item.Balance}</td>
-                      <td>
-                        <DeleteIcon />
-                      </td>
+                      <td>edit</td>
                     </tr>
                     {/* Level 1 */}
                     <RowComponent
@@ -485,9 +462,7 @@ function RowComponent({ children, id, level }) {
               <td>{data.Category_name}</td>
               <td>{data.DetailType}</td>
               <td>{data.Balance}</td>
-              <td>
-                <DeleteIcon />
-              </td>
+              <td>edit</td>
             </tr>
             <RowComponent
               children={children}

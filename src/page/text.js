@@ -11,102 +11,106 @@ import { Button } from "@material-ui/core";
 import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { LoginContext } from "./contexts/LoginContext";
-
+import moment from "moment";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import DeleteIcon from "@material-ui/icons/Delete";
+
+
 
 export default function ChartAccounts() {
   const [show, setShow] = useState(false);
   const handleClose = () => {
     setShow(false);
-    setType("");
-    setNamelaos("");
-    setNameeng("");
-    setCode_2009("");
-    setCode_1992("");
-    setCode("");
+    setType('');
     setShowUpdate(false);
-    setCheckType(false);
-    setErr_type("");
     setCheck(false);
+    setName('');
+    setDescription('')
+    setTypedetail('')
+    setPrentid('')
+    setNameShow('')
   };
   const handleShow = () => setShow(true);
   const [type, setType] = useState("");
-  const [code, setCode] = useState("");
-  const [namelaos, setNamelaos] = useState("");
-  const [nameeng, setNameeng] = useState("");
-
-  const [searchResutl, setSearchResult] = useState([]);
+  const [typedetail, setTypedetail] = useState("");
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [prentid, setPrentid] = useState("");
   const [check, setCheck] = useState(false);
-  const [statusType, setStatusType] = useState("");
-  const [code_2009, setCode_2009] = useState("");
-  const [code_1992, setCode_1992] = useState("");
-  const [typeName, setTypeName] = useState("");
   const [showUpdate, setShowUpdate] = useState(false);
-  const [checkType, setCheckType] = useState(false);
-  const [id, setId] = useState("");
-  const [err_namelaos, setErr_namelaos] = useState("");
-  const [err_type, setErr_type] = useState("");
-  const [err_status, setErr_status] = useState("");
-  const [err_code, setErr_code] = useState("");
-  const [err_codealready, setErr_codealready] = useState("");
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [checked, setChecked] = useState(false);
 
-  const { listCategory,listAccount } = useContext(LoginContext);
-
-
-
-
-  // const _onSearch = (e) => {
-  //   setCode(e);
-  //   if (check === true) {
-  //     let dataresult = listchartaccount.filter((el) => el.ac_code.includes(e));
-  //     setSearchResult(dataresult);
-  //     if (!e) {
-  //       setSearchResult([]);
-  //     }
-  //   }
-  // };
-
-  const [list, setList] = useState({});
-  const [nameList, setNameList] = useState([]);
-  const [detailCategory, setDetailCategory] = useState([]);
   const [detailCategoryFilter, setDetailCategoryFilter] = useState([]);
-
-
-  const OnloadCategoryShow=()=>{
-    axios.get("detail-categories").then((data) => {
-      setDetailCategory([...data.data.message]);
-    }).catch((err)=>{
-      console.log(err)
-    })
-  }
-  
+  const {
+    listCategory,
+    listAccount,
+    Onloadaccounts,
+    nameList,
+    OnloadAccountName,
+  } = useContext(LoginContext);
 
   useEffect(() => {
-    axios.get("/accounts").then((data) => {
-
-      setList({ ...data.data });
-      console.log({ ...data.data});
-    });
-    axios.get("/account-names").then((data) => {
-      setNameList([...data.data.message]);
-    });
-    OnloadCategoryShow();
-  }, []);
-  useEffect(() => {
-    const filter = detailCategory.filter((el) => el.Category_name === type);
-    setDetailCategoryFilter([...filter]);
+    // console.log(type)
+    // const filter = detailCategory.filter((el) => el.Category_id === type);
+    // console.log("filter=",filter)
+    // setDetailCategoryFilter([...filter]);
+    Search(type);
   }, [type]);
+
+  const onCheckboxClick = () => {
+    setIsDisabled(!checked);
+  };
+  const Search = (type) => {
+    axios
+      .get(`/showdetailCategory/${type}`)
+      .then((data) => {
+        setDetailCategoryFilter([...data?.data]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const CreateChartAccount = () => {
+    if(!type || !typedetail || !name ){
+      alert('ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບ');
+      return 
+    }
+    let data = {
+      Category_id: type,
+      DetailCategory_id: typedetail,
+      ChartAccountName: name,
+      CreateDate: moment().format("YYYY-MM-DD"),
+      Employee: "1",
+      Company_id: "1",
+      Description: description,
+      parent_id: prentid,
+    };
+    axios
+      .post("/CreateChartAccount", data)
+      .then((data) => {
+        Onloadaccounts();
+        OnloadAccountName();
+        handleClose(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const [nameShow, setNameShow] = useState("");
   const getNameList = (name) => {
-    axios.get(`/parents/${name}`).then((data) => {
+    axios.get(`/Allparents/${name}`).then((data) => {
       if (data?.data?.message.length > 0) {
-        console.log(data?.data?.message);
+        // console.log("name=",data?.data.message[0].Account_id);
+        setPrentid(data?.data.message[0].Account_id);
         const names = data?.data?.message.map((item) => {
-          return item.fullname;
+          return item.ChartAccountName;
         });
         names.reverse();
-        setNameShow(names.join("-"));
+        setNameShow(names.join(":"));
       }
     });
   };
@@ -142,17 +146,16 @@ export default function ChartAccounts() {
                     onChange={(e) => setType(e.target.value)}
                     value={type}
                   >
-                     <option>ໃຫ້ເລືອກປະເພດ</option>
+                    <option>ໃຫ້ເລືອກປະເພດ</option>
                     {listCategory &&
                       listCategory.map((data, index) => {
                         return (
-                          <option value={data.uid} key={index}>
+                          <option key={index} value={data?.Category_id}>
                             {data?.Category_name}
                           </option>
                         );
                       })}
                   </Form.Select>
-                  <p style={{ color: "red" }}>{err_type}</p>
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
@@ -161,19 +164,21 @@ export default function ChartAccounts() {
                   <Form.Label style={{ fontSize: 20 }}>Detail Type</Form.Label>
                   <Form.Select
                     aria-label="Default select example"
-                    onChange={(e) => setType(e.target.value)}
-                    value={type}
+                    onChange={(e) => setTypedetail(e.target.value)}
+                    value={typedetail}
                   >
-                    {
-                      detailCategoryFilter.map((data, index)=>{
+                    <option>ໃຫ້ເລືອກປະເພດ</option>
+                    {detailCategoryFilter &&
+                      detailCategoryFilter.map((data, index) => {
                         return (
-                          <option key={index} value="12">{data.DetailType}</option>
-                        )
-                      })
-                    }
+                          <option key={index} value={data.Detail_id}>
+                            {data.DetailType}
+                          </option>
+                        );
+                      })}
                   </Form.Select>
                 </Form.Group>
-                <p style={{ color: "red" }}>{err_namelaos}</p>
+
                 <Form.Group
                   className="mb-3"
                   controlId="exampleForm.ControlInput1"
@@ -190,26 +195,29 @@ export default function ChartAccounts() {
                 >
                   <Form.Label style={{ fontSize: 20 }}>Name</Form.Label>
 
-                  <Form.Control type="email" placeholder="Name" autoFocus />
+                  <Form.Control
+                    type="text"
+                    placeholder="Name"
+                    autoFocus
+                    onChange={(e) => setName(e.target.value)}
+                    value={name}
+                  />
                 </Form.Group>
                 <Form.Group
                   className="mb-3"
                   controlId="exampleForm.ControlInput1"
                 >
                   <Form.Label style={{ fontSize: 20 }}>Description</Form.Label>
-
                   <Form.Control
-                    type="email"
+                    type="text"
                     placeholder="Description"
                     autoFocus
+                    onChange={(e) => setDescription(e.target.value)}
+                    value={description}
                   />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                  <Form.Check
-                    type="checkbox"
-                    label="Is sub-account"
-                    onClick={() => setCheck(!check)}
-                  />
+                  <Form.Check type="checkbox" label="Is sub-account" />
                 </Form.Group>
                 <Form.Group>
                   <Autocomplete
@@ -228,16 +236,6 @@ export default function ChartAccounts() {
                   />
                   {nameShow}
                 </Form.Group>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter parent account"
-                    autoFocus
-                  />
-                </Form.Group>
               </div>
             </div>
           </Form>
@@ -249,7 +247,9 @@ export default function ChartAccounts() {
           {showUpdate ? (
             <Button variant="primary">Upate Changes1</Button>
           ) : (
-            <Button variant="primary">Save Changes1</Button>
+            <Button variant="primary" onClick={CreateChartAccount}>
+              Save Changes1
+            </Button>
           )}
         </Modal.Footer>
       </Modal>
@@ -290,7 +290,7 @@ export default function ChartAccounts() {
             }}
             onClick={() => {
               handleShow();
-              setCheckType(false);
+              setPrentid('')
             }}
           >
             <AddIcon />
@@ -429,13 +429,11 @@ export default function ChartAccounts() {
         <Table striped bordered hover size="sm">
           <thead>
             <tr>
-              <th>ລະຫັດ</th>
-              <th>ຊື່</th>
-              <th>ປະເພດ</th>
-              <th>ບັນຊີ2009</th>
-              <th>ບັນຊີ1992</th>
-              <th>ສະຖານະ</th>
-              <th>ໝ້າທີ່</th>
+              <th>NAME</th>
+              <th>TYPE</th>
+              <th>DETAIL TYPE</th>
+              <th>BALANCE</th>
+              <th align="right">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -445,17 +443,17 @@ export default function ChartAccounts() {
                 return (
                   <>
                     <tr key={index}>
-                      <td>{item.ChartAccountName}</td>
-                      <td>ຊື່</td>
-                      <td>ປະເພດ</td>
-                      <td>ບັນຊີ2009</td>
-                      <td>ບັນຊີ1992</td>
-                      <td>ສະຖານະ</td>
-                      <td>ໝ້າທີ່</td>
+                      <td style={{ width: 350 }}>{item.ChartAccountName}</td>
+                      <td>{item.Category_name}</td>
+                      <td>{item.DetailType}</td>
+                      <td>{item.Balance}</td>
+                      <td>
+                        <DeleteIcon />
+                      </td>
                     </tr>
                     {/* Level 1 */}
                     <RowComponent
-                      children={listAccount.children}
+                      children={listAccount && listAccount.children}
                       id={item.Account_id}
                       level={20}
                     />
@@ -486,14 +484,18 @@ function RowComponent({ children, id, level }) {
               >
                 {data.ChartAccountName}
               </td>
-              <td>ຊື່</td>
-              <td>ປະເພດ</td>
-              <td>ບັນຊີ2009</td>
-              <td>ບັນຊີ1992</td>
-              <td>ສະຖານະ</td>
-              <td>ໝ້າທີ່</td>
+              <td>{data.Category_name}</td>
+              <td>{data.DetailType}</td>
+              <td>{data.Balance}</td>
+              <td>
+                <DeleteIcon />
+              </td>
             </tr>
-            <RowComponent children={children} id={data.id} level={level * 2} />
+            <RowComponent
+              children={children}
+              id={data.Account_id}
+              level={level * 2}
+            />
           </>
         );
       })}

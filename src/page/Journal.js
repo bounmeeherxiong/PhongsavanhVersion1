@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -13,33 +13,117 @@ import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import OutlinedInput from "@material-ui/core/OutlinedInput";
 import FormControl from "@material-ui/core/FormControl";
 import DeleteIcon from "@material-ui/icons/Delete";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { LoginContext } from "./contexts/LoginContext";
+import axios from "axios";
+
+export default function Journal() {
+  const { nameList } = useContext(LoginContext);
+  const [prentid, setPrentid] = useState("");
+  const [nameShow, setNameShow] = useState("");
 
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
 });
+  const [rows, setRows] = useState([
+    {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    },
+    {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    },
+    {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    },
+    {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    },
+    {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    },
+    {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    },
+  ]);
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-export default function Journal() {
-  const [rows, setRows] = useState(['1','1','1','1','1']);
-  const push = () => {
-    setRows([...rows, rows]);
+  const getNameList = (name) => {
+    axios.get(`/Allparents/${name}`).then((data) => {
+      if (data?.data?.message.length > 0) {
+        // console.log("name=",data?.data.message[0].Account_id);
+        setPrentid(data?.data.message[0].Account_id);
+        const names = data?.data?.message.map((item) => {
+          return item.ChartAccountName;
+        });
+        names.reverse();
+        setNameShow(names.join(":"));
+      }
+    });
   };
+  const submit = (e) => {
+    e.preventDefault();
+    console.log(rows);
+  };
+
+  const handleFormChange = (event, index) => {
+    let data = [...rows];
+    data[index][event.target.name] = event.target.value;
+    setRows(data);
+  };
+  const addFields = () => {
+    let object = {
+      AccountName: "",
+      Debit: "",
+      Credit: "",
+      Description: "",
+      Tax: "",
+      Employee: "",
+    };
+    setRows([...rows, object]);
+  };
+  const remove = (index) => {
+    // console.log(index)
+    let data = [...rows];
+    data.splice(index, 1);
+    setRows(data);
+  };
+
   const classes = useStyles();
-  const removeArray = (index) => {
-    if (rows.length > 5) {
-        let oldarray = [...rows]
-        oldarray.splice(index, 1);
-        setRows([...oldarray])
-    }
-  };
+
   return (
     <div>
-      <button onClick={() => push()}>pust</button>
       <Breadcrumbs aria-label="breadcrumb">
         <div
           style={{
@@ -95,13 +179,31 @@ export default function Journal() {
               <TableCell>ລາຍລະອຽດ</TableCell>
               <TableCell>ຊື່ພະນັກງານ</TableCell>
               <TableCell>ຢ</TableCell>
+              <TableCell>ຢ</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row,index) => (
-              <TableRow key={row.name}>
-                <TableCell style={{ width: 50 }}>1</TableCell>
-                <TableCell style={{ width: 300, backgroundColor: "red" }}>
+            {rows.map((data, index) => (
+              <TableRow key={index}>
+                <TableCell style={{ width: 50 }}>{index + 1}</TableCell>
+                <TableCell style={{ width: 300 }}>
+                  <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    sx={{ width: 300 }}
+                    options={nameList}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Name List"
+                        onBlur={(e) => getNameList(e.target.value)}
+                        value={nameShow}
+                      />
+                    )}
+                  />
+                     {nameShow}
+                </TableCell>
+                <TableCell>
                   <FormControl
                     className={clsx(classes.margin, classes.textField)}
                     variant="outlined"
@@ -109,7 +211,10 @@ export default function Journal() {
                     <OutlinedInput
                       id="outlined-adornment-weight"
                       aria-describedby="outlined-weight-helper-text"
-                      style={{ height: 35, width: 300 }}
+                      style={{ height: 35, width: 100 }}
+                      name="Debit"
+                      onChange={(event) => handleFormChange(event, index)}
+                      value={data.Debit}
                     />
                   </FormControl>
                 </TableCell>
@@ -122,18 +227,9 @@ export default function Journal() {
                       id="outlined-adornment-weight"
                       aria-describedby="outlined-weight-helper-text"
                       style={{ height: 35, width: 100 }}
-                    />
-                  </FormControl>
-                </TableCell>
-                <TableCell>
-                  <FormControl
-                    className={clsx(classes.margin, classes.textField)}
-                    variant="outlined"
-                  >
-                    <OutlinedInput
-                      id="outlined-adornment-weight"
-                      aria-describedby="outlined-weight-helper-text"
-                      style={{ height: 35, width: 100 }}
+                      name="Credit"
+                      onChange={(event) => handleFormChange(event, index)}
+                      value={data.Credit}
                     />
                   </FormControl>
                 </TableCell>
@@ -146,6 +242,9 @@ export default function Journal() {
                       id="outlined-adornment-weight"
                       aria-describedby="outlined-weight-helper-text"
                       style={{ height: 35 }}
+                      name="Description"
+                      onChange={(event) => handleFormChange(event, index)}
+                      value={data.Description}
                     />
                   </FormControl>
                 </TableCell>
@@ -159,27 +258,45 @@ export default function Journal() {
                       aria-describedby="outlined-weight-helper-text"
                       labelWidth={0}
                       style={{ height: 35 }}
+                      name="Tax"
+                      onChange={(event) => handleFormChange(event, index)}
+                      value={data.Tax}
                     />
                   </FormControl>
                 </TableCell>
                 <TableCell>
-                  <DeleteIcon style={{ cursor: "pointer" }} onClick={()=>removeArray(index)}/>
+                  <FormControl
+                    className={clsx(classes.margin, classes.textField)}
+                    variant="outlined"
+                  >
+                    <OutlinedInput
+                      id="outlined-adornment-weight"
+                      aria-describedby="outlined-weight-helper-text"
+                      labelWidth={0}
+                      style={{ height: 35 }}
+                      name="Employee"
+                      onChange={(event) => handleFormChange(event, index)}
+                      value={data.Employee}
+                    />
+                  </FormControl>
+                </TableCell>
+                <TableCell>
+                  <DeleteIcon style={{ cursor: "pointer" }} />
                 </TableCell>
               </TableRow>
             ))}
             <TableRow>
-              <TableCell
-                colSpan={2}
-                style={{ backgroundColor: "red" }}
-                align="right"
-              >
-                Total
+              <TableCell colSpan={2} align="right">
+                Total:
               </TableCell>
-              <TableCell align="left">20000</TableCell>
-              <TableCell align="left">20000</TableCell>
+              <TableCell align="right">20000</TableCell>
+              <TableCell align="right">20000</TableCell>
             </TableRow>
           </TableBody>
         </Table>
+        <button onClick={addFields}>Add lines....</button>
+        <button onClick={remove}>Clear lines....</button>
+        <button onClick={submit}>Saving</button>
       </TableContainer>
     </div>
   );
