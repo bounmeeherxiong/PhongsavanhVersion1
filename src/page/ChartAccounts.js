@@ -12,24 +12,22 @@ import { Modal } from "react-bootstrap";
 import axios from "axios";
 import { LoginContext } from "./contexts/LoginContext";
 import moment from "moment";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
 import DeleteIcon from "@material-ui/icons/Delete";
 export default function ChartAccounts() {
   const [show, setShow] = useState(false);
 
   const handleClose = () => {
     setShow(false);
-    setType('');
+    setType("");
     setShowUpdate(false);
     setCheck(false);
-    setName('');
-    setDescription('');
-    setTypedetail('');
-    setPrentid('');
-    setNameShow('');
+    setName("");
+    setDescription("");
+    setTypedetail("");
+    setPrentid("");
+    setNameShow("");
     setIsDisabled(true);
-    setNameShow('')
+    setNameShow("");
   };
   const handleShow = () => setShow(true);
   const [type, setType] = useState("");
@@ -45,7 +43,7 @@ export default function ChartAccounts() {
   const [showBox, setShowBox] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [active, setActive] = useState("");
-  const [disblebtn, setDisblebtn] = useState(true)
+  const [disblebtn, setDisblebtn] = useState(true);
   const {
     listCategory,
     listAccount,
@@ -57,7 +55,6 @@ export default function ChartAccounts() {
   useEffect(() => {
     Search(type);
   }, [type]);
-
 
   const Search = (type) => {
     axios
@@ -91,6 +88,18 @@ export default function ChartAccounts() {
         Onloadaccounts();
         OnloadAccountName();
         handleClose(false);
+        setDisblebtn(true);
+        setShow(false);
+        setType("");
+        setShowUpdate(false);
+        setCheck(false);
+        setName("");
+        setDescription("");
+        setTypedetail("");
+        setPrentid("");
+        setNameShow("");
+        setIsDisabled(true);
+        setNameShow("");
       })
       .catch((err) => {
         console.log(err);
@@ -106,14 +115,13 @@ export default function ChartAccounts() {
         });
         names.reverse();
         setNameShow(names.join(":"));
-        setShowBox(!showBox)
+        setShowBox(!showBox);
       }
     });
   };
   const _onSearchList = (e) => {
     setNameShow(e);
-   let searchName =  nameList.filter((el) => el.label.includes(e));
-    // console.log("name:",searchName)
+    let searchName = nameList.filter((el) => el.label.includes(e));
     if (!e) {
       setSearchResult([]);
     } else {
@@ -183,7 +191,6 @@ export default function ChartAccounts() {
                     })}
                 </Form.Select>
               </Form.Group>
-
               <Form.Group
                 className="mb-3"
                 controlId="exampleForm.ControlInput1"
@@ -199,7 +206,6 @@ export default function ChartAccounts() {
                 controlId="exampleForm.ControlInput1"
               >
                 <Form.Label style={{ fontSize: 20 }}>Name</Form.Label>
-
                 <Form.Control
                   type="text"
                   placeholder="Name"
@@ -222,7 +228,15 @@ export default function ChartAccounts() {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" checked = {isDisabled} label="Is sub-account" onClick={()=>{setDisblebtn(!disblebtn);setIsDisabled(!isDisabled)}} />
+                <Form.Check
+                  type="checkbox"
+                  checked={isDisabled}
+                  label="Is sub-account"
+                  onClick={() => {
+                    setDisblebtn(!disblebtn);
+                    setIsDisabled(!isDisabled);
+                  }}
+                />
               </Form.Group>
               <Form.Group>
                 <div
@@ -244,7 +258,7 @@ export default function ChartAccounts() {
                       flex: 1,
                       height: 40,
                       outline: "none",
-                      paddingLeft:10
+                      paddingLeft: 10,
                     }}
                     onClick={() => setShowBox(true)}
                   />
@@ -265,8 +279,8 @@ export default function ChartAccounts() {
                   style={{
                     overflowY: "scroll",
                     height: 100,
-                    paddingTop:5,
-                    paddingLeft:10
+                    paddingTop: 5,
+                    paddingLeft: 10,
                   }}
                 >
                   {searchResult.length > 0 ? (
@@ -275,10 +289,14 @@ export default function ChartAccounts() {
                         return (
                           <>
                             <span
-                              style={{ cursor: "pointer",fontWeight: active === data?.label ? 'bold':'' }}
+                              style={{
+                                cursor: "pointer",
+                                fontWeight:
+                                  active === data?.label ? "bold" : "",
+                              }}
                               onClick={() => getNameList(data?.label)}
-                              onMouseOver={()=>setActive(data?.label)}
-                              onMouseLeave={()=>setActive(null)}
+                              onMouseOver={() => setActive(data?.label)}
+                              onMouseLeave={() => setActive(null)}
                             >
                               {data?.label}
                             </span>
@@ -293,10 +311,14 @@ export default function ChartAccounts() {
                         return (
                           <>
                             <span
-                              style={{ cursor: "pointer",fontWeight: active === data?.label ? 'bold':'' }}
+                              style={{
+                                cursor: "pointer",
+                                fontWeight:
+                                  active === data?.label ? "bold" : "",
+                              }}
                               onClick={() => getNameList(data?.label)}
-                              onMouseOver={()=>setActive(data?.label)}
-                              onMouseLeave={()=>setActive(null)}
+                              onMouseOver={() => setActive(data?.label)}
+                              onMouseLeave={() => setActive(null)}
                             >
                               {data?.label}
                             </span>
@@ -385,7 +407,6 @@ export default function ChartAccounts() {
           height: 10,
         }}
       ></div>
-
       <div
         style={{
           display: "flex",
@@ -449,7 +470,6 @@ export default function ChartAccounts() {
         >
           <CloseIcon />
         </button>
-
         <div
           style={{
             display: "flex",
