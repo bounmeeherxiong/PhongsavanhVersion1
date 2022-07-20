@@ -15,9 +15,9 @@ import moment from "moment";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import DeleteIcon from "@material-ui/icons/Delete";
-
 export default function ChartAccounts() {
   const [show, setShow] = useState(false);
+
   const handleClose = () => {
     setShow(false);
     setType("");
@@ -39,8 +39,11 @@ export default function ChartAccounts() {
   const [showUpdate, setShowUpdate] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
   const [checked, setChecked] = useState(false);
-
+  const [nameShow, setNameShow] = useState("");
   const [detailCategoryFilter, setDetailCategoryFilter] = useState([]);
+  const [showBox, setShowBox] = useState(false);
+  const [searchResult, setSearchResult] = useState([]);
+  const [active, setActive] = useState("");
   const {
     listCategory,
     listAccount,
@@ -98,7 +101,6 @@ export default function ChartAccounts() {
       });
   };
 
-  const [nameShow, setNameShow] = useState("");
   const getNameList = (name) => {
     axios.get(`/Allparents/${name}`).then((data) => {
       if (data?.data?.message.length > 0) {
@@ -109,8 +111,19 @@ export default function ChartAccounts() {
         });
         names.reverse();
         setNameShow(names.join(":"));
+        setShowBox(!showBox)
       }
     });
+  };
+  const _onSearchList = (e) => {
+    setNameShow(e);
+   let searchName =  nameList.filter((el) => el.label.includes(e));
+    // console.log("name:",searchName)
+    if (!e) {
+      setSearchResult([]);
+    } else {
+      setSearchResult([...searchName]);
+    }
   };
   return (
     <>
@@ -124,101 +137,100 @@ export default function ChartAccounts() {
           <Modal.Title>Account</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <div
-              style={{
-                display: "flex",
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-              }}
-            >
-              <div style={{ width: "100%" }}>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
+          <div
+            style={{
+              display: "flex",
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ width: "100%" }}>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlInput1"
+              >
+                <Form.Label style={{ fontSize: 20 }}>Account Type</Form.Label>
+                <Form.Select
+                  aria-label="Default select example"
+                  onChange={(e) => setType(e.target.value)}
+                  value={type}
                 >
-                  <Form.Label style={{ fontSize: 20 }}>Account Type</Form.Label>
-                  <Form.Select
-                    aria-label="Default select example"
-                    onChange={(e) => setType(e.target.value)}
-                    value={type}
-                  >
-                    <option>ໃຫ້ເລືອກປະເພດ</option>
-                    {listCategory &&
-                      listCategory.map((data, index) => {
-                        return (
-                          <option key={index} value={data?.Category_id}>
-                            {data?.Category_name}
-                          </option>
-                        );
-                      })}
-                  </Form.Select>
-                </Form.Group>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
+                  <option>ໃຫ້ເລືອກປະເພດ</option>
+                  {listCategory &&
+                    listCategory.map((data, index) => {
+                      return (
+                        <option key={index} value={data?.Category_id}>
+                          {data?.Category_name}
+                        </option>
+                      );
+                    })}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlInput1"
+              >
+                <Form.Label style={{ fontSize: 20 }}>Detail Type</Form.Label>
+                <Form.Select
+                  aria-label="Default select example"
+                  onChange={(e) => setTypedetail(e.target.value)}
+                  value={typedetail}
                 >
-                  <Form.Label style={{ fontSize: 20 }}>Detail Type</Form.Label>
-                  <Form.Select
-                    aria-label="Default select example"
-                    onChange={(e) => setTypedetail(e.target.value)}
-                    value={typedetail}
-                  >
-                    <option>ໃຫ້ເລືອກປະເພດ</option>
-                    {detailCategoryFilter &&
-                      detailCategoryFilter.map((data, index) => {
-                        return (
-                          <option key={index} value={data.Detail_id}>
-                            {data.DetailType}
-                          </option>
-                        );
-                      })}
-                  </Form.Select>
-                </Form.Group>
+                  <option>ໃຫ້ເລືອກປະເພດ</option>
+                  {detailCategoryFilter &&
+                    detailCategoryFilter.map((data, index) => {
+                      return (
+                        <option key={index} value={data.Detail_id}>
+                          {data.DetailType}
+                        </option>
+                      );
+                    })}
+                </Form.Select>
+              </Form.Group>
 
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Label style={{ fontSize: 20 }}></Form.Label>
-                  <Form.Control as="textarea" rows={3} />
-                </Form.Group>
-              </div>
-              <div style={{ width: 15 }}></div>
-              <div style={{ width: "100%" }}>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Label style={{ fontSize: 20 }}>Name</Form.Label>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlInput1"
+              >
+                <Form.Label style={{ fontSize: 20 }}></Form.Label>
+                <Form.Control as="textarea" rows={3} />
+              </Form.Group>
+            </div>
+            <div style={{ width: 15 }}></div>
+            <div style={{ width: "100%" }}>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlInput1"
+              >
+                <Form.Label style={{ fontSize: 20 }}>Name</Form.Label>
 
-                  <Form.Control
-                    type="text"
-                    placeholder="Name"
-                    autoFocus
-                    onChange={(e) => setName(e.target.value)}
-                    value={name}
-                  />
-                </Form.Group>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput1"
-                >
-                  <Form.Label style={{ fontSize: 20 }}>Description</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Description"
-                    autoFocus
-                    onChange={(e) => setDescription(e.target.value)}
-                    value={description}
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                  <Form.Check type="checkbox" label="Is sub-account" />
-                </Form.Group>
-                <Form.Group>
-                  <Autocomplete
+                <Form.Control
+                  type="text"
+                  placeholder="Name"
+                  autoFocus
+                  onChange={(e) => setName(e.target.value)}
+                  value={name}
+                />
+              </Form.Group>
+              <Form.Group
+                className="mb-3"
+                controlId="exampleForm.ControlInput1"
+              >
+                <Form.Label style={{ fontSize: 20 }}>Description</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Description"
+                  autoFocus
+                  onChange={(e) => setDescription(e.target.value)}
+                  value={description}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                <Form.Check type="checkbox" label="Is sub-account" />
+              </Form.Group>
+              <Form.Group>
+                {/* <Autocomplete
                     disablePortal
                     id="combo-box-demo"
                     options={nameList}
@@ -227,16 +239,96 @@ export default function ChartAccounts() {
                       <TextField
                         {...params}
                         label="Name List"
-                        onBlur={(e) => getNameList(e.target.value)}
-                        value={nameShow}
+                        onChange={(e) => getNameList(e.target.value)}
+                        value={'ok'}
                       />
                     )}
                   />
-                  {nameShow}
-                </Form.Group>
-              </div>
+                  {nameShow} */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    autoFocus
+                    onChange={(e) => _onSearchList(e.target.value)}
+                    value={nameShow}
+                    style={{
+                      border: "1px solid #ccc",
+                      borderRight: "none",
+                      flex: 1,
+                      height: 40,
+                      outline: "none",
+                      paddingLeft:10
+                    }}
+                    onClick={() => setShowBox(true)}
+                  />
+                  <button
+                    style={{
+                      border: "1px solid #ccc",
+                      backgroundColor: "white",
+                      borderLeft: "none",
+                    }}
+                    onClick={() => setShowBox(!showBox)}
+                  >
+                    <DeleteIcon />
+                  </button>
+                </div>
+              </Form.Group>
+              {showBox && (
+                <div
+                  style={{
+                    overflowY: "scroll",
+                    height: 100,
+                    paddingTop:5,
+                    paddingLeft:10
+                  }}
+                >
+                  {searchResult.length > 0 ? (
+                    <>
+                      {searchResult.map((data, index) => {
+                        return (
+                          <>
+                            <span
+                              style={{ cursor: "pointer",fontWeight: active === data?.label ? 'bold':'' }}
+                              onClick={() => getNameList(data?.label)}
+                              onMouseOver={()=>setActive(data?.label)}
+                              onMouseLeave={()=>setActive(null)}
+                            >
+                              {data?.label}
+                            </span>
+                            <br />
+                          </>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <>
+                      {nameList.map((data, index) => {
+                        return (
+                          <>
+                            <span
+                              style={{ cursor: "pointer",fontWeight: active === data?.label ? 'bold':'' }}
+                              onClick={() => getNameList(data?.label)}
+                              onMouseOver={()=>setActive(data?.label)}
+                              onMouseLeave={()=>setActive(null)}
+                            >
+                              {data?.label}
+                            </span>
+                            <br />
+                          </>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+              )}
             </div>
-          </Form>
+          </div>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
