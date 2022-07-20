@@ -20,14 +20,16 @@ export default function ChartAccounts() {
 
   const handleClose = () => {
     setShow(false);
-    setType("");
+    setType('');
     setShowUpdate(false);
     setCheck(false);
-    setName("");
-    setDescription("");
-    setTypedetail("");
-    setPrentid("");
-    setNameShow("");
+    setName('');
+    setDescription('');
+    setTypedetail('');
+    setPrentid('');
+    setNameShow('');
+    setIsDisabled(true);
+    setNameShow('')
   };
   const handleShow = () => setShow(true);
   const [type, setType] = useState("");
@@ -37,13 +39,13 @@ export default function ChartAccounts() {
   const [prentid, setPrentid] = useState("");
   const [check, setCheck] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [checked, setChecked] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const [nameShow, setNameShow] = useState("");
   const [detailCategoryFilter, setDetailCategoryFilter] = useState([]);
   const [showBox, setShowBox] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [active, setActive] = useState("");
+  const [disblebtn, setDisblebtn] = useState(true)
   const {
     listCategory,
     listAccount,
@@ -53,16 +55,10 @@ export default function ChartAccounts() {
   } = useContext(LoginContext);
 
   useEffect(() => {
-    // console.log(type)
-    // const filter = detailCategory.filter((el) => el.Category_id === type);
-    // console.log("filter=",filter)
-    // setDetailCategoryFilter([...filter]);
     Search(type);
   }, [type]);
 
-  const onCheckboxClick = () => {
-    setIsDisabled(!checked);
-  };
+
   const Search = (type) => {
     axios
       .get(`/showdetailCategory/${type}`)
@@ -104,7 +100,6 @@ export default function ChartAccounts() {
   const getNameList = (name) => {
     axios.get(`/Allparents/${name}`).then((data) => {
       if (data?.data?.message.length > 0) {
-        // console.log("name=",data?.data.message[0].Account_id);
         setPrentid(data?.data.message[0].Account_id);
         const names = data?.data?.message.map((item) => {
           return item.ChartAccountName;
@@ -227,24 +222,9 @@ export default function ChartAccounts() {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                <Form.Check type="checkbox" label="Is sub-account" />
+                <Form.Check type="checkbox" checked = {isDisabled} label="Is sub-account" onClick={()=>{setDisblebtn(!disblebtn);setIsDisabled(!isDisabled)}} />
               </Form.Group>
               <Form.Group>
-                {/* <Autocomplete
-                    disablePortal
-                    id="combo-box-demo"
-                    options={nameList}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Name List"
-                        onChange={(e) => getNameList(e.target.value)}
-                        value={'ok'}
-                      />
-                    )}
-                  />
-                  {nameShow} */}
                 <div
                   style={{
                     display: "flex",
@@ -254,6 +234,7 @@ export default function ChartAccounts() {
                   <input
                     type="text"
                     placeholder="Description"
+                    disabled={disblebtn}
                     autoFocus
                     onChange={(e) => _onSearchList(e.target.value)}
                     value={nameShow}
@@ -506,8 +487,7 @@ export default function ChartAccounts() {
             </tr>
           </thead>
           <tbody>
-            {listAccount &&
-              listAccount.message &&
+            {listAccount.message &&
               listAccount.message.map((item, index) => {
                 return (
                   <>
