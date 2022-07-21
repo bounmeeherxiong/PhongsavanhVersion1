@@ -64,7 +64,7 @@ function App() {
   const Onloadaccounts=()=>{
     axios.get("/Allaccounts").then((data)=>{
       setListAccount({...data?.data})
-      console.log("Allaccounts=",{...data.data})
+
      
     }).catch((err)=>{
       console.log(err)
@@ -73,7 +73,7 @@ function App() {
   const OnloadAccountName=()=>{
     axios.get("/Accountnames").then((data) => {
       setNameList([...data.data.message]);
-      console.log("nameList=",[...data.data.message])
+
     }).catch((err)=>{
       console.log(err)
     })

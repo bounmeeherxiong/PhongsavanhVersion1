@@ -4,16 +4,47 @@ import { Table } from "react-bootstrap";
 import { LoginContext } from "./contexts/LoginContext";
 import axios from "axios";
 
-function Journal() {
+const Journal = () => {
+  const [data, setData] = useState([{}]);
+
+  const addMore = () => {
+    setData([...data, {}]);
+  };
+
+  return (
+    <div>
+      {JSON.stringify(data)}
+      <table width={"100%"}>
+        <tr>
+          <td>Index</td>
+          <td>Name</td>
+          <td>Text</td>
+        </tr>
+        {data.map((item, index) => {
+          return (
+            <RowComponent
+              key={index}
+              index={index}
+              data={data}
+              setData={setData}
+            />
+          );
+        })}
+      </table>
+      <button onClick={addMore}>Add more</button>
+    </div>
+  );
+};
+
+function RowComponent({ index, data, setData }) {
   const { nameList } = useContext(LoginContext);
   const [prentid, setPrentid] = useState("");
   const [nameShow, setNameShow] = useState("");
-  const [category_id, setCategory_id] = useState("");
-  const [detailCategory_id, setDetailCategory_id] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [active, setActive] = useState("");
   const [showBox, setShowBox] = useState(false);
-  const getNameList = (name) => {
+
+  const getNameList = (name, index = null) => {
     axios.get(`/Allparents/${name}`).then((data) => {
       if (data?.data?.message.length > 0) {
         setPrentid(data?.data.message[0].Account_id);
@@ -22,11 +53,15 @@ function Journal() {
         });
         names.reverse();
         setNameShow(names.join(":"));
+        changeText(names.join(":"), "name");
         setShowBox(!showBox);
       }
     });
+    if (index !== null) {
+      console.log(index);
+    }
   };
-  const _onSearchList = (e) => {
+  const _onSearchList = (e, name) => {
     setNameShow(e);
     let searchName = nameList.filter((el) => el.label.includes(e));
     if (!e) {
@@ -36,188 +71,103 @@ function Journal() {
     }
   };
 
-  const [formFields, setFormFields] = useState([
-    {
-      category_id: "",
-      detailCategory_id: "",
-      prentid: "",
-      Description: "",
-      Tax: "",
-      Amount: "",
-    },
-  ]);
-  const handleFormChange = (event, index) => {
-    // console.log(index,event.target.name)
-    let data = [...formFields];
-    data[index][event.target.name] = event.target.value;
-    setFormFields(data);
-  };
-  const submit = (e) => {
-    e.preventDefault();
-    console.log(formFields);
-    // axios.post("/transactions", formFields).then((data) => {
-    //   console.log(data);
-    // });
-  };
-  const addFields = () => {
-    let object = {
-      category_id: category_id,
-      detailCategory_id: detailCategory_id,
-      prentid: prentid,
-      Description: "",
-      Tax: "",
-      Amount: "",
-    };
-
-  
-
-    setFormFields([...formFields, object]);
-  };
-
-
-  const remove = (index) => {
-    // console.log(index)
-    let data = [...formFields];
-    data.splice(index, 1);
-    setFormFields(data);
+  const changeText = (value, key) => {
+    const object = { ...data[index] };
+    object[key] = value;
+    const cloneData = [...data];
+    cloneData[index] = { ...object };
+    setData([...cloneData]);
   };
   return (
-    <>
-      <Table striped bordered hover>
-        <tbody>
-          {formFields &&
-            formFields.map((data, index) => {
-              return (
-                <tr>
-                  <td>1</td>
-                  <td>
-                    <input
-                      type="text"
-                      placeholder="Description"
-                      onChange={(e) => _onSearchList(e.target.value)}
-                      value={nameShow}
-                      autoFocus
-                      style={{
-                        border: "1px solid #ccc",
-                        borderRight: "none",
-                        flex: 1,
-                        height: 40,
-                        outline: "none",
-                        paddingLeft: 10,
-                      }}
-                      onClick={() => setShowBox(true)}
-                    />
-                  </td>
-                  {showBox && (
-                    <div
-                      style={{
-                        overflowY: "scroll",
-                        height: 100,
-                        paddingTop: 5,
-                        paddingLeft: 10,
-                      }}
-                    >
-                      {searchResult.length > 0 ? (
-                        <>
-                          {searchResult.map((data, index) => {
-                            return (
-                              <>
-                                <span
-                                  style={{
-                                    cursor: "pointer",
-                                    fontWeight:
-                                      active === data?.label ? "bold" : "",
-                                  }}
-                                  onClick={() => getNameList(data?.label)}
-                                  onMouseOver={() => setActive(data?.label)}
-                                  onMouseLeave={() => setActive(null)}
-                                >
-                                  {data?.label}
-                                </span>
-                                <br />
-                              </>
-                            );
-                          })}
-                        </>
-                      ) : (
-                        <>
-                          {nameList.map((data, index) => {
-                            return (
-                              <>
-                                <span
-                                  style={{
-                                    cursor: "pointer",
-                                    fontWeight:
-                                      active === data?.label ? "bold" : "",
-                                  }}
-                                  onClick={() => getNameList(data?.label)}
-                                  onMouseOver={() => setActive(data?.label)}
-                                  onMouseLeave={() => setActive(null)}
-                                >
-                                  {data?.label}
-                                </span>
-                                <br />
-                              </>
-                            );
-                          })}
-                        </>
-                      )}
-                    </div>
-                  )}
-                  <td>
-                    <input
-                      type="text"
-                      name="debit"
-                      placeholder="Name"
-                      onChange={(event) => handleFormChange(event, index)}
-                      value={data.debit}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="Credit"
-                      placeholder="Name"
-                      onChange={(event) => handleFormChange(event, index)}
-                      value={data.Credit}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="Description"
-                      placeholder="Name"
-                      onChange={(event) => handleFormChange(event, index)}
-                      value={data.Description}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="Tax"
-                      placeholder="Description"
-                      onChange={(event) => handleFormChange(event, index)}
-                      value={data.Tax}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      name="Employee"
-                      placeholder="Description"
-                      onChange={(event) => handleFormChange(event, index)}
-                      value={data.Employee}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </Table>
-      <button onClick={addFields}>Add more....</button>
-      <br />
-      <button onClick={submit}>Submit</button>
-    </>
+    <tr>
+      <td>{index}</td>
+      <td>
+        <input
+          placeholder="Account Name"
+          value={data[index].name}
+          onChange={(e) => {
+           
+            _onSearchList(e.target.value, "name");
+          }}
+          onClick={() => setShowBox(true)}
+        />
+        {showBox && (
+          <div
+            style={{
+              overflowY: "scroll",
+              height: 100,
+              paddingTop: 5,
+              paddingLeft: 10,
+            }}
+          >
+            {searchResult.length > 0 ? (
+              <>
+                {searchResult.map((data, index1) => {
+                  return (
+                    <>
+                      <span
+                        style={{
+                          cursor: "pointer",
+                          fontWeight: active === data?.label ? "bold" : "",
+                        }}
+                        onClick={() => getNameList(data?.id, index)}
+                        onMouseOver={() => setActive(data?.label)}
+                        onMouseLeave={() => setActive(null)}
+                      >
+                        {data?.label}
+                      </span>
+                      <br />
+                    </>
+                  );
+                })}
+              </>
+            ) : (
+              <>
+                {nameList.map((data, index1) => {
+                  return (
+                    <>
+                      <span
+                        style={{
+                          cursor: "pointer",
+                          fontWeight: active === data?.label ? "bold" : "",
+                        }}
+                        onClick={() => getNameList(data?.id, index)}
+                        onMouseOver={() => setActive(data?.label)}
+                        onMouseLeave={() => setActive(null)}
+                      >
+                        {data?.label}
+                      </span>
+                      <br />
+                    </>
+                  );
+                })}
+              </>
+            )}
+          </div>
+        )}
+      </td>
+      <td>
+        <input
+          placeholder="Text"
+          value={data[index].text}
+          onChange={(e) => changeText(e.target.value, "text")}
+        />
+      </td>
+      <td>
+        <input
+          placeholder="Text"
+          value={data[index].text}
+          onChange={(e) => changeText(e.target.value, "text")}
+        />
+      </td>
+      <td>
+        <input
+          placeholder="Text"
+          value={data[index].text}
+          onChange={(e) => changeText(e.target.value, "text")}
+        />
+      </td>
+    </tr>
   );
 }
 

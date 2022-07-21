@@ -20,7 +20,7 @@ export default function ChartAccounts() {
     setShow(false);
     setType("");
     setShowUpdate(false);
-    setCheck(false);
+  
     setName("");
     setDescription("");
     setTypedetail("");
@@ -35,7 +35,7 @@ export default function ChartAccounts() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [prentid, setPrentid] = useState("");
-  const [check, setCheck] = useState(false);
+
   const [showUpdate, setShowUpdate] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [nameShow, setNameShow] = useState("");
@@ -92,7 +92,7 @@ export default function ChartAccounts() {
         setShow(false);
         setType("");
         setShowUpdate(false);
-        setCheck(false);
+       
         setName("");
         setDescription("");
         setTypedetail("");
@@ -106,8 +106,9 @@ export default function ChartAccounts() {
       });
   };
 
-  const getNameList = (name) => {
-    axios.get(`/Allparents/${name}`).then((data) => {
+  const getNameList = (id) => {
+    console.log("id=",id)
+    axios.get(`/Allparents/${id}`).then((data) => {
       if (data?.data?.message.length > 0) {
         setPrentid(data?.data.message[0].Account_id);
         const names = data?.data?.message.map((item) => {
@@ -121,7 +122,7 @@ export default function ChartAccounts() {
   };
   const _onSearchList = (e) => {
     setNameShow(e);
-    let searchName = nameList.filter((el) => el.label.includes(e));
+    let searchName = nameList.filter((el) => el.id.includes(e));
     if (!e) {
       setSearchResult([]);
     } else {
@@ -294,7 +295,7 @@ export default function ChartAccounts() {
                                 fontWeight:
                                   active === data?.label ? "bold" : "",
                               }}
-                              onClick={() => getNameList(data?.label)}
+                              onClick={() => getNameList(data?.id)}
                               onMouseOver={() => setActive(data?.label)}
                               onMouseLeave={() => setActive(null)}
                             >
@@ -316,7 +317,7 @@ export default function ChartAccounts() {
                                 fontWeight:
                                   active === data?.label ? "bold" : "",
                               }}
-                              onClick={() => getNameList(data?.label)}
+                              onClick={() => getNameList(data?.id)}
                               onMouseOver={() => setActive(data?.label)}
                               onMouseLeave={() => setActive(null)}
                             >
@@ -338,7 +339,7 @@ export default function ChartAccounts() {
             Close
           </Button>
           {showUpdate ? (
-            <Button variant="primary">Upate Changes1</Button>
+            <Button variant="primary">update Changes1</Button>
           ) : (
             <Button variant="primary" onClick={CreateChartAccount}>
               Save Changes1
