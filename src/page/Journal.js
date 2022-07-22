@@ -1,5 +1,4 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Table } from "react-bootstrap";
 
 import { LoginContext } from "./contexts/LoginContext";
 import axios from "axios";
@@ -86,7 +85,6 @@ function RowComponent({ index, data, setData }) {
           placeholder="Account Name"
           value={data[index].name}
           onChange={(e) => {
-           
             _onSearchList(e.target.value, "name");
           }}
           onClick={() => setShowBox(true)}
@@ -148,21 +146,21 @@ function RowComponent({ index, data, setData }) {
       </td>
       <td>
         <input
-          placeholder="Text"
+          placeholder="Debit"
           value={data[index].text}
           onChange={(e) => changeText(e.target.value, "text")}
         />
       </td>
       <td>
         <input
-          placeholder="Text"
+          placeholder="Credit"
           value={data[index].text}
           onChange={(e) => changeText(e.target.value, "text")}
         />
       </td>
       <td>
         <input
-          placeholder="Text"
+          placeholder="Description"
           value={data[index].text}
           onChange={(e) => changeText(e.target.value, "text")}
         />
